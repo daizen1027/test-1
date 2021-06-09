@@ -1,0 +1,103 @@
+﻿@using System.Globalization
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Identity
+
+@inject IViewLocalizer localizer
+
+@inject SignInManager<IdentityUser> signInManager
+
+@model Agent.Models.MachineLock
+@{
+    ViewData["Title"] = "Agent Page";
+}
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+    var initialLoad = false;
+    $(document).ready(function () {
+        $("select").change(function () {
+            $(this).find("option:selected").each(function () {
+                var optionValue = $(this).attr("value");
+                if (optionValue == "Forever") {
+                    $("#Code2").hide();
+                    $("#Code3").show();
+                } else {
+                    $("#Code2").show();
+                    $("#Code3").hide();
+                }
+            });
+            if (initialLoad)
+                $("#unlock_code").val("");
+            else {
+                initialLoad = true;
+            }
+
+        }).change();
+    });
+</script>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole(RoleSeed.Admin.ToString()) || User.IsInRole(RoleSeed.Agent.ToString())))
+{
+
+    <h1>Unlock</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Index">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label class="control-label">解鎖類別</label>
+                    <select class="form-control" asp-for="TypeUnlock" name="unlock_type">
+                        <option value="Temp">暫時(Temporarily)</option>
+                        @if (Model != null && Model.TypeUnlock == "Forever")
+                        {
+                            <option value="Forever" selected>永久(Forever)</option>
+
+                        }
+                        else
+                        {
+                            <option value="Forever">永久(Forever)</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CodeMac" class="control-label">機器號碼(Machine Number)</label>
+                    <input asp-for="CodeMac" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Code1" class="control-label">第一碼(First Code)</label>
+                    <input asp-for="Code1" class="form-control" />
+                </div>
+                <div id="Code2" class="form-group">
+                    <label asp-for="Code2" class="control-label">第二碼(Second Code)</label>
+                    <input asp-for="Code2" class="form-control" />
+                </div>
+                <div id="Code3" class="form-group">
+                    <label asp-for="Code3" class="control-label">第三碼(Third Code)</label>
+                    <input asp-for="Code3" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Send" class="btn btn-primary" />
+                </div>
+                <div class="form-group">
+                    <!--<label class="control-label">@localizer["CodeUnlock"]</label> -->
+                    <label class="control-label">解鎖碼(Unlock Code)</label>
+                    <input id="unlock_code" type="text" class="form-control" readonly value=@Html.DisplayFor(model => model.CodeUnlock)>
+                </div>
+
+            </form>
+
+        </div>
+    </div>    
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4">Please Login First</h1>
+    </div>
+}
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

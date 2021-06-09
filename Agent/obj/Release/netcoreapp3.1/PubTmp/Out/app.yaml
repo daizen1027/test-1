@@ -1,0 +1,15 @@
+# Optional file for deploying to Google App Engine Flexible Environment.
+runtime: aspnetcore
+env: flex
+
+# Remember - storing secrets in plaintext is potentially unsafe. Consider using
+# something like https://cloud.google.com/secret-manager/docs/overview to help keep
+# secrets secret.
+env_variables:
+    DB_USER: postgres
+    DB_PASS: 1027
+    DB_NAME: agent
+    DB_HOST: cloudsql
+
+beta_settings:
+    cloud_sql_instances: "boxwood-bebop-315802:asia-east1:postgresql-dai=tcp:5432"
